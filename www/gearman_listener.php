@@ -4,25 +4,25 @@
  *
  * @author  Jose F. D'Silva
  * @package  Gearman
- *
- * TODO:
- * 1. Create non-blocking listener than can be executed from the browser.
- * 2. Logging for Gearman. Use Monolog and created logs in cms/data/log/gearman/ rotary type logging.
  */
+
+use Monolog\Logger;
+
 require_once 'init.php';
 
-$worker = new Common_Gearman_Worker();
-$worker->addFunction(Common_Gearman_Client::REGISTERED_FUNC_NAME, function(GearmanJob $gearmanJob)
+$listener = new Common_Gearman_Listener();
+$logger = $listener->getLogger();
+$listener->setDefaultJobHandler(function(GearmanJob $gearmanJob) use ($logger)
 {
-    printf("Fetched job [handle: %s, uniqueId: %s]\n", $gearmanJob->handle(), $gearmanJob->unique());
-    $jobWrapper = new Common_Gearman_JobWrapper($gearmanJob);
+    $s = sprintf("Fetched job [handle: %s, uniqueId: %s]", $gearmanJob->handle(), $gearmanJob->unique());
+    $logger->log(Logger::INFO, $s);
+    $jobWrapper = new Common_Gearman_JobWrapper($gearmanJob, $logger);
     $task = $jobWrapper->getJob();
     if ($task) {
         return $task->handle();
     }
     
-    print $job->handle().' is not a valid job instance. Task ignored.'."\n";
+    $s = sprintf("%s[uniqId: %s] is not a valid job instance. Job ignored.", $job->handle(), $job->unique());
+    $logger->log(Logger::ERROR, $s);
 });
-
-print "Listening for jobs...\n";
-while ($worker->work());
+$listener->listen();

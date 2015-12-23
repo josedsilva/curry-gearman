@@ -5,26 +5,32 @@
  * @author  Jose F. D'Silva
  * @package  Gearman
  */
+use Monolog\Logger;
+
 class Common_Gearman_Client extends GearmanClient
 {
     const PRIORITY_NORMAL = 'Normal';
     const PRIORITY_HIGH = 'High';
     const PRIORITY_LOW = 'Low';
-    const REGISTERED_FUNC_NAME = 'curry_gearman_job_handler';
+    const DEFAULT_JOB_HANDLER = 'curry_gearman_job_handler';
     
     protected $server;
+    protected $port;
+    protected $logger = null;
     
-    public function __construct($server = '127.0.0.1')
+    public function __construct($server = '127.0.0.1', $port = 4730, Logger $logger = null)
     {
         parent::__construct();
         $this->server = $server;
-        $this->addServer($this->server);
+        $this->port = $port;
+        $this->addServer($this->server, $this->port);
+        $this->logger = $logger;
     }
     
     /**
      * Helper function to add a task to the client.
      * The object is automatically serialized.
-     * @param Project_JobAbstract $job
+     * @param Common_JobAbstract $job
      * @param string $priority
      * @param mixed|null $context   The application context.
      * @param string|null $unique   If unique is a variable set to false, the generated id is returned,
@@ -32,7 +38,7 @@ class Common_Gearman_Client extends GearmanClient
      *                              If null, then the system will generate the unique id.
      * @param boolean $background   Whether this is a background job?
      */
-    public function addJob(Project_JobAbstract $job, $priority = self::PRIORITY_NORMAL, &$context = null, &$unique = null, $background = false)
+    public function addJob(Common_JobAbstract $job, $priority = self::PRIORITY_NORMAL, &$context = null, &$unique = null, $background = false)
     {
         $uniqueId = uniqid();
         if (!is_null($unique)) {
@@ -46,17 +52,17 @@ class Common_Gearman_Client extends GearmanClient
         }
         
         $taskMethod = 'addTask'.($priority !== self::PRIORITY_NORMAL ? $priority : '').($background ? 'Background' : '');
-        return $this->{$taskMethod}(self::REGISTERED_FUNC_NAME, @serialize($job), $context, $uniqueId);
+        return $this->{$taskMethod}(self::DEFAULT_JOB_HANDLER, @serialize($job), $context, $uniqueId);
     }
     
     /**
      * Add a background job.
-     * @param Project_JobAbstract $job
+     * @param Common_JobAbstract $job
      * @param string $priority
      * @param mixed|null $context
      * @param string|null $unique
      */
-    public function addJobBackground(Project_JobAbstract $job, $priority = self::PRIORITY_NORMAL, &$context = null, &$unique = null)
+    public function addJobBackground(Common_JobAbstract $job, $priority = self::PRIORITY_NORMAL, &$context = null, &$unique = null)
     {
         return $this->addJob($job, $priority, $context, $unique, true);
     }

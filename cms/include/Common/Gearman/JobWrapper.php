@@ -5,13 +5,17 @@
  * @author  Jose F. D'Silva
  * @package  Gearman
  */
+use Monolog\Logger;
+
 class Common_Gearman_JobWrapper
 {
-    private $gearmanJob = null;
+    protected $gearmanJob = null;
+    protected $logger = null;
     
-    public function __construct(GearmanJob $gearmanJob)
+    public function __construct(GearmanJob $gearmanJob, Logger $logger = null)
     {
         $this->gearmanJob = $gearmanJob;
+        $this->logger = $logger;
     }
     
     public function getJob()
@@ -19,7 +23,10 @@ class Common_Gearman_JobWrapper
         $ret = @unserialize($this->gearmanJob->workload());
         if (!($ret instanceof Common_JobAbstract)) {
             $ret = null;
-            // TODO: log error: invalid class type.
+            if (!is_null($this->logger)) {
+                $s = sprintf("Job[%s] is not an instance of Common_JobAbstract.", $this->gearmanJob->handle());
+                $this->logger->log(Logger::ERROR, $s);
+            }
         }
         return $ret;
     }
