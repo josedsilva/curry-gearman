@@ -12,7 +12,6 @@ class Common_Gearman_Client extends GearmanClient
     const PRIORITY_NORMAL = 'Normal';
     const PRIORITY_HIGH = 'High';
     const PRIORITY_LOW = 'Low';
-    const DEFAULT_JOB_HANDLER = 'curry_gearman_job_handler';
     
     protected $server;
     protected $port;
@@ -65,5 +64,14 @@ class Common_Gearman_Client extends GearmanClient
     public function addJobBackground(Common_JobAbstract $job, $priority = self::PRIORITY_NORMAL, &$context = null, &$unique = null)
     {
         return $this->addJob($job, $priority, $context, $unique, true);
+    }
+    
+    /**
+     * Return the name of the default job handler hook.
+     * The worker for this project will listen to this hook.
+     */
+    public static function getDefaultJobHandler()
+    {
+        return 'curry_gearman_job_handler_'.md5(Curry_Core::$config->curry->projectName);
     }
 }

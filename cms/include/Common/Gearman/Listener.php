@@ -134,7 +134,7 @@ class Common_Gearman_Listener
      */
     public function setDefaultJobHandler($callback)
     {
-        return $this->setHook(Common_Gearman_Client::DEFAULT_JOB_HANDLER, $callback);
+        return $this->setHook(Common_Gearman_Client::getDefaultJobHandler(), $callback);
     }
     
     /**
