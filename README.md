@@ -17,6 +17,9 @@ or see appropriate instruction at [gearman.org](http://gearman.org/getting-start
 Integration with Curry:
 
 1. Start the gearman job server ``sudo gearmand -d``
+(This should already be started by default: ``service --status-all | grep 'gearman-job-server'``)
 2. Merge the directory structure with your project.
-3. Start the gearman_listener script: 
-<code>php gearman_listener.php 2>&1 /dev/null &</code>
+3. Start the gearman_listener script or add it to /etc/rc.local
+<code>
+php gearman_listener.php 2>&1 /dev/null &
+</code>
