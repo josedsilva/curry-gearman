@@ -30,6 +30,8 @@ class Common_Gearman_Listener
         if (!$this->isConsole) {
             // set non-blocking listener when executed in browser.
             $this->setNonBlocking();
+            $this->log('Nonblocking listener setup when executed from browser.');
+            print '<p>Nonblocking listener is listening on hook: '.Common_Gearman_Client::getDefaultJobHandler().'</p>';
         }
     }
     
@@ -75,7 +77,7 @@ class Common_Gearman_Listener
         }
         
         if (!$this->isValidHash($_GET['hash'])) {
-            $this->logger->log(Logger::WARNING, 'Invalid hash specified. Should be: '.$this->getHash());
+            $this->log('Invalid hash specified. Should be: '.$this->getHash(), Logger::ERROR);
             throw new Exception('Invalid hash.');
         }
     }
@@ -129,7 +131,7 @@ class Common_Gearman_Listener
     }
     
     /**
-     * Bind callback to the DEFAULT_JOB_HANDLER hook.
+     * Bind callback to the default job handler hook.
      * @param callable $callback
      */
     public function setDefaultJobHandler($callback)
@@ -144,5 +146,8 @@ class Common_Gearman_Listener
     public function listen()
     {
         while ($this->worker->work());
+        if (!$this->isConsole) {
+            print '<p>Listener has finished execution and has stopped.</p>';
+        }
     }
 }

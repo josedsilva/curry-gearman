@@ -19,10 +19,12 @@ $listener->setDefaultJobHandler(function(GearmanJob $gearmanJob) use ($logger)
     $jobWrapper = new Common_Gearman_JobWrapper($gearmanJob, $logger);
     $task = $jobWrapper->getJob();
     if ($task) {
+        $task->setLogger($logger);
+        $task->setUniqueId($gearmanJob->unique());
         return $task->handle();
     }
     
-    $s = sprintf("%s[uniqId: %s] is not a valid job instance. Job ignored.", $job->handle(), $job->unique());
+    $s = sprintf("%s[uniqId: %s] is not a valid job instance. Job ignored.", $gearmanJob->handle(), $gearmanJob->unique());
     $logger->log(Logger::ERROR, $s);
-});
-$listener->listen();
+})
+->listen();

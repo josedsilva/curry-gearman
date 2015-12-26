@@ -27,7 +27,8 @@ class Common_Gearman_Client extends GearmanClient
     }
     
     /**
-     * Helper function to add a task to the client.
+     * Helper function to add a job to the client.
+     * The job is registered with the default job handler.
      * The object is automatically serialized.
      * @param Common_JobAbstract $job
      * @param string $priority
@@ -51,7 +52,7 @@ class Common_Gearman_Client extends GearmanClient
         }
         
         $taskMethod = 'addTask'.($priority !== self::PRIORITY_NORMAL ? $priority : '').($background ? 'Background' : '');
-        return $this->{$taskMethod}(self::DEFAULT_JOB_HANDLER, @serialize($job), $context, $uniqueId);
+        return $this->{$taskMethod}(self::getDefaultJobHandler(), @serialize($job), $context, $uniqueId);
     }
     
     /**
