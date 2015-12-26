@@ -82,14 +82,15 @@ class Common_Gearman_Listener
         }
     }
     
-    public function getHash()
+    public static function getHash()
     {
-        return md5(Curry_Core::$config->curry->secret . __CLASS__);
+        $token = Curry_Core::$config->modules->contrib->CurryGearman->token ?: __CLASS__;
+        return sha1(Curry_Core::$config->curry->secret . $token);
     }
     
     protected function isValidHash($hash)
     {
-        return ($hash == $this->getHash());
+        return ($hash == self::getHash());
     }
     
     public function log($msg, $level = Logger::INFO, array $context = array())
