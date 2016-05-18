@@ -11,6 +11,8 @@ The Gearman package for Curry cms.
 
 or see appropriate instruction at [gearman.org](http://gearman.org/getting-started/)
 
+You can also refer to this article at http://www.hostingadvice.com/how-to/install-gearman-ubuntu-14-04/
+
 ### Integration with Curry:
 
 1. Start the gearman job server    
