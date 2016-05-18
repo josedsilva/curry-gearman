@@ -15,12 +15,13 @@ You can also refer to this article at http://www.hostingadvice.com/how-to/instal
 
 ### Integration with Curry:
 
-1. Start the gearman job server    
+1. Start the gearman job server:    
 ``sudo gearmand -d``    
 (This should have already been started by default: ``service --status-all | grep 'gearman-job-server'``)
 2. Merge the directory structure with your project.
-3. Start the gearman_listener script or add it to ``/etc/rc.local``    
-``php gearman_listener.php > /dev/null 2>&1 &``
+3. Start the project's gearman listener:    
+``php /path/to/myproject/www/gearman_listener.php > /dev/null 2>&1 &``
+4. If your project is on an Ubuntu machine, you could try using the *upstart* script.
 
 ### Examples
 Create a job to email users.
