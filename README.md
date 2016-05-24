@@ -16,8 +16,8 @@ You can also refer to this article at http://www.hostingadvice.com/how-to/instal
 ### Integration with Curry:
 
 1. Start the gearman job server:    
-``sudo gearmand -d``    
-(This should have already been started by default: ``service --status-all | grep 'gearman-job-server'``)
+``sudo service gearman-job-server start``    
+(This should have already been started by default: ``sudo service gearman-job-server status``)
 2. Merge the directory structure with your project.
 3. Start the project's gearman listener:    
 ``php /path/to/myproject/www/gearman_listener.php > /dev/null 2>&1 &``
