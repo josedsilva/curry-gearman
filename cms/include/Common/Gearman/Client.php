@@ -13,17 +13,23 @@ class Common_Gearman_Client extends GearmanClient
     const PRIORITY_HIGH = 'High';
     const PRIORITY_LOW = 'Low';
     
+    const DEFAULT_SERVER_IP = '127.0.0.1';
+    const DEFAULT_SERVER_PORT = 4730;
+    
     protected $server;
     protected $port;
     protected $logger = null;
     
-    public function __construct($server = '127.0.0.1', $port = 4730, Logger $logger = null)
+    public function __construct(Logger $logger = null)
     {
         parent::__construct();
-        $this->server = $server;
-        $this->port = $port;
+        $this->server = Curry_Core::$config->modules->contrib->CurryGearman->server->ip ?: self::DEFAULT_SERVER_IP;
+        $this->port = Curry_Core::$config->modules->contrib->CurryGearman->server->port ?: self::DEFAULT_SERVER_PORT;
         $this->addServer($this->server, $this->port);
         $this->logger = $logger;
+        if (!is_null($this->logger)) {
+            $this->logger->log(Logger::INFO, 'job server added to client', ['server' => $this->server, 'port' => $this->port]);
+        }
     }
     
     /**
@@ -52,7 +58,7 @@ class Common_Gearman_Client extends GearmanClient
         }
         
         $taskMethod = 'addTask'.($priority !== self::PRIORITY_NORMAL ? $priority : '').($background ? 'Background' : '');
-        return $this->{$taskMethod}(self::getDefaultJobHandler(), @serialize($job), $context, $uniqueId);
+        return $this->{$taskMethod}(self::getJobHandler(), @serialize($job), $context, $uniqueId);
     }
     
     /**
@@ -71,8 +77,17 @@ class Common_Gearman_Client extends GearmanClient
      * Return the name of the default job handler hook.
      * The worker for this project will listen to this hook.
      */
-    public static function getDefaultJobHandler()
+    protected static function getDefaultJobHandler()
     {
         return 'curry_gearman_job_handler_'.md5(Curry_Core::$config->curry->projectName);
+    }
+    
+    public static function getJobHandler()
+    {
+        $jobHandler = Curry_Core::$config->modules->contrib->CurryGearman->jobHandler;
+        if (!$jobHandler) {
+            $jobHandler = self::getDefaultJobHandler();
+        }
+        return $jobHandler;
     }
 }
