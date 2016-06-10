@@ -13,13 +13,14 @@ class Common_Gearman_Worker extends GearmanWorker
     protected $port;
     protected $logger = null;
     
-    public function __construct($server = '127.0.0.1', $port = 4730, Logger $logger = null)
+    public function __construct(Logger $logger = null)
     {
         parent::__construct();
-        $this->server = $server;
-        $this->port = $port;
+        $this->server = Curry_Core::$config->modules->contrib->CurryGearman->server->ip ?: Common_Gearman_Client::DEFAULT_SERVER_IP;
+        $this->port = Curry_Core::$config->modules->contrib->CurryGearman->server->port ?: Common_Gearman_Client::DEFAULT_SERVER_PORT;
         $this->addServer($this->server, $this->port);
         $this->logger = $logger;
+        $this->logger->log(Logger::INFO, 'job server added to worker', ['server' => $this->server, 'port' => $this->port]);
     }
     
 }

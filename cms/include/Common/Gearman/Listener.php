@@ -12,26 +12,22 @@ use Monolog\Handler\StreamHandler;
 class Common_Gearman_Listener
 {
     protected $worker;
-    protected $server;
-    protected $port;
     protected $isNonBlocking = false;
     protected $isConsole;
     protected $logger;
     protected $logFile;
     
-    public function __construct($server = '127.0.0.1', $port = 4730)
+    public function __construct()
     {
-        $this->server = $server;
-        $this->port = $port;
         $this->initLogger();
         $this->isConsole = $this->getIsConsole();
         $this->validateToken();
-        $this->worker = new Common_Gearman_Worker($this->server, $this->port, $this->logger);
+        $this->worker = new Common_Gearman_Worker($this->logger);
         if (!$this->isConsole) {
             // set non-blocking listener when executed in browser.
             $this->setNonBlocking();
-            $this->log('Nonblocking listener setup when executed from browser.');
-            print '<p>Nonblocking listener is listening on hook: '.Common_Gearman_Client::getDefaultJobHandler().'</p>';
+            $this->log('Nonblocking listener setup when executed from browser.', Logger::INFO, ['job_handler' => Common_Gearman_Client::getJobHandler()]);
+            print '<p>Nonblocking listener is listening on hook: '.Common_Gearman_Client::getJobHandler().'</p>';
         }
     }
     
@@ -77,8 +73,8 @@ class Common_Gearman_Listener
         }
         
         if (!$this->isValidHash($_GET['hash'])) {
-            $this->log('Invalid hash specified. Should be: '.$this->getHash(), Logger::ERROR);
-            throw new Exception('Invalid hash.');
+            $this->log('token is invalid.', Logger::ERROR);
+            throw new Exception('Token is invalid.');
         }
     }
     
@@ -132,12 +128,12 @@ class Common_Gearman_Listener
     }
     
     /**
-     * Bind callback to the default job handler hook.
+     * Bind callback to the job handler hook.
      * @param callable $callback
      */
-    public function setDefaultJobHandler($callback)
+    public function setJobHandler($callback)
     {
-        return $this->setHook(Common_Gearman_Client::getDefaultJobHandler(), $callback);
+        return $this->setHook(Common_Gearman_Client::getJobHandler(), $callback);
     }
     
     /**
