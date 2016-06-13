@@ -12,7 +12,7 @@ require_once 'init.php';
 
 $listener = new Common_Gearman_Listener();
 $logger = $listener->getLogger();
-$listener->setDefaultJobHandler(function(GearmanJob $gearmanJob) use ($logger)
+$listener->setJobHandler(function(GearmanJob $gearmanJob) use ($logger)
 {
     $s = sprintf("Fetched job [handle: %s, uniqueId: %s]", $gearmanJob->handle(), $gearmanJob->unique());
     $logger->log(Logger::INFO, $s);

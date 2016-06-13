@@ -52,7 +52,7 @@ class Common_Gearman_Client extends GearmanClient
         }
         
         $taskMethod = 'addTask'.($priority !== self::PRIORITY_NORMAL ? $priority : '').($background ? 'Background' : '');
-        return $this->{$taskMethod}(self::getDefaultJobHandler(), @serialize($job), $context, $uniqueId);
+        return $this->{$taskMethod}(self::getJobHandler(), @serialize($job), $context, $uniqueId);
     }
     
     /**
@@ -71,8 +71,17 @@ class Common_Gearman_Client extends GearmanClient
      * Return the name of the default job handler hook.
      * The worker for this project will listen to this hook.
      */
-    public static function getDefaultJobHandler()
+    protected static function getDefaultJobHandler()
     {
         return 'curry_gearman_job_handler_'.md5(Curry_Core::$config->curry->projectName);
+    }
+    
+    public static function getJobHandler()
+    {
+        $jobHandler = Curry_Core::$config->modules->contrib->CurryGearman->jobHandler;
+        if (!$jobHandler) {
+            $jobHandler = self::getDefaultJobHandler();
+        }
+        return $jobHandler;
     }
 }

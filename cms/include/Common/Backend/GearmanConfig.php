@@ -9,10 +9,16 @@ class Common_Backend_GearmanConfig extends Curry_Backend
     
     public function showMain()
     {
+        $this->flushConfigCache();
         $form = new Curry_Form(array(
             'url' => url('', $_GET),
             'method' => 'post',
             'elements' => array(
+                'job_handler' => array('text', array(
+                    'label' => 'Job handler',
+                    'value' => Curry_Core::$config->modules->contrib->CurryGearman->jobHandler,
+                    'placeholder' => 'Leave empty to use default',
+                )),
                 'token' => array('text', array(
                     'label' => 'Token',
                     'description' => 'To execute the listener from the browser, a hash is required.',
@@ -41,10 +47,14 @@ HTML;
     
     protected function saveConfig(array $values)
     {
+        $this->addBreadcrumb('Configurations', url('', array('module')));
+        $this->addBreadcrumb('saveConfig', url());
+        
         $config = new Zend_Config(require(Curry_Core::$config->curry->configPath), true);
         $config->modules = array(
             'contrib' => array(
                 'CurryGearman' => array(
+                    'jobHandler' => trim($values['job_handler']) ?: null,
                     'token' => $values['token'],
                 ),
             ),

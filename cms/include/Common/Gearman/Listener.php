@@ -31,7 +31,7 @@ class Common_Gearman_Listener
             // set non-blocking listener when executed in browser.
             $this->setNonBlocking();
             $this->log('Nonblocking listener setup when executed from browser.');
-            print '<p>Nonblocking listener is listening on hook: '.Common_Gearman_Client::getDefaultJobHandler().'</p>';
+            print '<p>Nonblocking listener is listening on hook: '.Common_Gearman_Client::getJobHandler().'</p>';
         }
     }
     
@@ -132,12 +132,12 @@ class Common_Gearman_Listener
     }
     
     /**
-     * Bind callback to the default job handler hook.
+     * Bind callback to the job handler hook.
      * @param callable $callback
      */
-    public function setDefaultJobHandler($callback)
+    public function setJobHandler($callback)
     {
-        return $this->setHook(Common_Gearman_Client::getDefaultJobHandler(), $callback);
+        return $this->setHook(Common_Gearman_Client::getJobHandler(), $callback);
     }
     
     /**
