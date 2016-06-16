@@ -22,14 +22,14 @@ class Common_Gearman_Client extends GearmanClient
         parent::__construct();
         $this->server = $server;
         $this->port = $port;
-        $this->addServer($this->server, $this->port);
         $this->logger = $logger;
+        $this->addServer($this->server, $this->port);
     }
     
     /**
-     * Helper function to add a job to the client.
-     * The job is registered with the default job handler.
-     * The object is automatically serialized.
+     * Helper function to add a task to the job server.
+     * You will still need to call Common_Gearman_Client::runTasks after adding all your tasks.
+     * The job object is automatically serialized.
      * @param Common_JobAbstract $job
      * @param string $priority
      * @param mixed|null $context   The application context.
