@@ -27,7 +27,7 @@ class Common_Gearman_Worker extends GearmanWorker
     protected function getId()
     {
         if (is_null($this->workerId)) {
-            $this->workerId = str_replace(" ", "_", strtolower(Curry_Core::$config->curry->name));
+            $this->workerId = strtolower(str_replace(" ", "_", Curry_Core::$config->curry->name).'_'.uniqid());
         }
         return $this->workerId;
     }
